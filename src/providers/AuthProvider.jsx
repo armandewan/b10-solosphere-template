@@ -50,18 +50,30 @@ const AuthProvider = ({ children }) => {
       photoURL: photo,
     })
   }
-
+  
   // onAuthStateChange
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, currentUser => {
-      setUser(currentUser)
-      console.log('CurrentUser-->', currentUser)
-      setLoading(false)
-    })
-    return () => {
+  useEffect(()=>{
+   const unsubscribe = onAuthStateChanged(auth, currentUser => {
+    setUser(currentUser)
+    console.log('CurrentUser-->', currentUser)
+    setLoading(false);
+    });
+    return () =>{
       return unsubscribe()
     }
-  }, [])
+  },[])
+
+  // onAuthStateChange
+  // useEffect(() => {
+  //   const unsubscribe = onAuthStateChanged(auth, currentUser => {
+  //     setUser(currentUser)
+  //     console.log('CurrentUser-->', currentUser)
+  //     setLoading(false)
+  //   })
+  //   return () => {
+  //     return unsubscribe()
+  //   }
+  // }, [])
 
   const authInfo = {
     user,

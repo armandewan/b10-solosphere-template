@@ -1,14 +1,49 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
+import { AuthContext } from '../providers/AuthProvider'
+import axios from 'axios';
+import toast from "react-hot-toast"
+import { useNavigate } from 'react-router-dom';
 
 const AddJob = () => {
-  const [startDate, setStartDate] = useState(new Date())
-  const handleSubmit = (e) =>{
+  const navigate = useNavigate();
+  const {user} = useContext(AuthContext);
+  const [startDate, setStartDate] = useState(new Date());
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    const title = e.target.job_title.value
-    console.log(title)
+    const from = e.target
+    const title = from.job_title.value
+    const email = from.email.value
+    const dateline = startDate
+    const category = from.category.value
+    const min_price = parseFloat(from.min_price.value)
+    const max_price = parseFloat(from.max_price.value)
+    const description = from.description.value
 
+    const formData = {
+      title,
+      buyer : {email,name:user?.displayName,photo:user?.photoURL},
+      dateline,
+      category,
+      min_price,
+      max_price,
+      description,
+      bid_count : 0,
+    }
+    console.log(formData);
+    // post request
+    // const {data} = await axios.post(`${import.meta.env.VITE_API_URL}/add-jobs`,formData);
+    //  console.log(data);
+    try{
+      await axios.post(`${import.meta.env.VITE_API_URL}/add-jobs`,formData);
+      toast.success('Data added sucessfully!!!');
+      navigate('/my-posted-jobs');
+    }
+    catch(err){
+      console.log(err);
+      toast.error(err.message);
+    }
   }
 
   return (
@@ -39,6 +74,8 @@ const AddJob = () => {
               <input
                 id='emailAddress'
                 type='email'
+                defaultValue = {user?.email}
+                disabled = {true}
                 name='email'
                 className='block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md  focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40  focus:outline-none focus:ring'
               />

@@ -1,13 +1,58 @@
+import { useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { AuthContext } from '../providers/AuthProvider'
+import axios from 'axios';
+import { format } from 'date-fns';
+import toast from 'react-hot-toast';
 
 const MyPostedJobs = () => {
+  const {user} =useContext(AuthContext);
+    const [jobs,setJobs]= useState([]);
+  
+    useEffect(()=>{
+      fetchAllJobs()
+    },[user]);
+    const fetchAllJobs = async ()=>{
+      const {data} = await axios.get(`${import.meta.env.VITE_API_URL}/jobs/${user?.email}`)
+      setJobs(data)
+    }
+    
+    // perticular job delete
+    const handleDelete = async id =>{
+      try {
+        const {data} = await axios.delete(`${import.meta.env.VITE_API_URL}/job/${id}`);
+        toast.success('Data deleted sucessfully!!!');
+        console.log(data)
+        fetchAllJobs()
+      }catch(err){
+        console.log(err)
+        toast.error(err.message);
+      }
+    }
+    const smartToast = (id)=>{
+      toast((t) => (
+        <div className='flex gap-3 items-center'>
+          <p>Are your <b className='text-orange-500'>sure? </b></p>
+          <button className='bg-red-300 p-1 rounded-md hover:text-start hover:text-red-600 hover:font-extrabold'
+          onClick={() =>{ 
+            toast.dismiss(t.id)
+            handleDelete(id)
+           }}>
+            Delete
+          </button>
+          <button className='bg-green-300 p-1 rounded-md hover:text-start hover:text-green-500 hover:font-extrabold' onClick={() => toast.dismiss(t.id)}>
+            Cancle
+          </button>
+        </div>
+      ));
+    }
   return (
     <section className='container px-4 mx-auto pt-12'>
       <div className='flex items-center gap-x-3'>
         <h2 className='text-lg font-medium text-gray-800 '>My Posted Jobs</h2>
 
         <span className='px-3 py-1 text-xs text-blue-600 bg-blue-100 rounded-full '>
-          4 Job
+          {jobs.length} Jobs
         </span>
       </div>
 
@@ -62,33 +107,38 @@ const MyPostedJobs = () => {
                   </tr>
                 </thead>
                 <tbody className='bg-white divide-y divide-gray-200 '>
-                  <tr>
+                  {/* ganarate dynamic  */}
+                 {jobs.map(job=> <tr key={jobs._id}>
                     <td className='px-4 py-4 text-sm text-gray-500  whitespace-nowrap'>
-                      E-commerce Website Development
+                      {job.title}
                     </td>
 
                     <td className='px-4 py-4 text-sm text-gray-500  whitespace-nowrap'>
-                      28/05/2024
+                      Deadline: {format(new Date (job.dateline),'P')}
                     </td>
 
                     <td className='px-4 py-4 text-sm text-gray-500  whitespace-nowrap'>
-                      $500-$600
+                    ${job.min_price} - ${job.max_price}
                     </td>
                     <td className='px-4 py-4 text-sm whitespace-nowrap'>
                       <div className='flex items-center gap-x-2'>
                         <p
-                          className={`px-3 py-1  text-blue-500 bg-blue-100/60 text-xs  rounded-full`}
-                        >
-                          Web Development
+                          // className={`px-3 py-1  text-blue-500 bg-blue-100/60 text-xs  rounded-full` } 
+                          className={`px-3 py-1  bg-blue-100/60 text-xs rounded-full ${job.category=== 'Web Development' && ' text-blue-500'}
+                          ${job.category=== 'Graphics Design' && ' text-amber-400'}
+                          ${job.category=== 'Digital Marketing' && ' text-red-400'}
+                          `}
+                        >	
+                         {job.category}
                         </p>
                       </div>
                     </td>
                     <td className='px-4 py-4 text-sm text-gray-500  whitespace-nowrap'>
-                      Dramatically redefine bleeding-edge...
+                    {job.description.substring(0,40)}...
                     </td>
                     <td className='px-4 py-4 text-sm whitespace-nowrap'>
                       <div className='flex items-center gap-x-6'>
-                        <button className='text-gray-500 transition-colors duration-200   hover:text-red-500 focus:outline-none'>
+                        <button onClick={()=>smartToast(job._id)} className='text-gray-500 transition-colors duration-200   hover:text-red-500 focus:outline-none'>
                           <svg
                             xmlns='http://www.w3.org/2000/svg'
                             fill='none'
@@ -106,8 +156,8 @@ const MyPostedJobs = () => {
                         </button>
 
                         <Link
-                          to={`/update/1`}
-                          className='text-gray-500 transition-colors duration-200   hover:text-yellow-500 focus:outline-none'
+                          to={`/update/${job._id}`}
+                          className='text-gray-500 transition-colors duration-200 hover:text-yellow-500 focus:outline-none'
                         >
                           <svg
                             xmlns='http://www.w3.org/2000/svg'
@@ -126,7 +176,7 @@ const MyPostedJobs = () => {
                         </Link>
                       </div>
                     </td>
-                  </tr>
+                  </tr>)}
                 </tbody>
               </table>
             </div>
