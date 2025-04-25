@@ -31,7 +31,7 @@ const AddJob = () => {
       description,
       bid_count : 0,
     }
-    console.log(formData);
+    // console.log(formData);
     // post request
     // const {data} = await axios.post(`${import.meta.env.VITE_API_URL}/add-jobs`,formData);
     //  console.log(data);
