@@ -19,13 +19,13 @@ const JobCard = ({job}) => {
           Deadline: {format(new Date (dateline),'P')}
         </span>
         <span className='px-3 py-1 text-[8px] text-blue-800 uppercase bg-blue-200 rounded-full '>
-          {title}
+          {category}
         </span>
       </div>
 
       <div>
         <h1 className='mt-2 text-lg font-semibold text-gray-800 '>
-         {category}
+         {title}
         </h1>
 
         <p className='mt-2 text-sm text-gray-600 '>
